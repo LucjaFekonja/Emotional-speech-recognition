@@ -1,5 +1,5 @@
 def get_class_savee(file_name):
-    file_name = file_name.split("/")[1]
+    file_name = file_name.split("/")[2]
 
     if file_name[3] == "n":
         return "neutral"
