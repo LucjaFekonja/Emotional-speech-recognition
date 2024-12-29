@@ -361,3 +361,54 @@ def calculate_feature_matrix(file_names):
     return X
 
     
+def calculate_selected_features(file_name):
+    
+    x, sr = read_file(file_name)
+
+    xenergy = energy(x)
+    xzero_crossing_rate = zero_crossing_rate(x)
+    xenergy_times_zero_crossing_rate = energy_times_zero_crossing_rate(x)
+    xpitch = pitch(x, sr)
+
+    basic_features = {"energy": xenergy,
+                      "zero_crossing_rate": xzero_crossing_rate,
+                      "energy_times_zero_crossing_rate": xenergy_times_zero_crossing_rate}
+    
+    features = dict()
+    for k, v in basic_features.items():
+        # Calculate first and second derivative of each signal
+        diff = derivative(v)
+        diff_diff = derivative(diff)
+
+        # Calculate other statistics: max, min, mean, standard deviation, skewness, kurtosis 
+        features["min_" + k] = [float(np.min(v))]
+        features["max_" + k] = [float(np.max(v))]
+        features["mean_" + k] = [float(np.mean(v))]
+        features["std_" + k] = [float(np.std(v))]
+        features["ske_" + k] = [float(scipy.stats.skew(v, axis=0))]
+        features["kur_" + k] = [float(scipy.stats.kurtosis(v, axis=0))]
+    
+        # Calculate other statistics: max, min, mean, standard deviation, skewness, kurtosis; for first derivative
+        features["min_1_diff_" + k] = [float(np.min(diff))]
+        features["max_1_diff_" + k] = [float(np.max(diff))]
+        features["mean_1_diff_" + k] = [float(np.mean(diff))]
+        features["std_1_diff_" + k] = [float(np.std(diff))]
+        features["ske_1_diff_" + k] = [float(scipy.stats.skew(diff, axis=0))]
+        features["kur_1_diff_" + k] = [float(scipy.stats.kurtosis(diff, axis=0))]
+    
+        # Calculate other statistics: max, min, mean, standard deviation, skewness, kurtosis; for second derivative
+        features["min_2_diff_" + k] = [float(np.min(diff_diff))]
+        features["max_2_diff_" + k] = [float(np.max(diff_diff))]
+        features["mean_2_diff_" + k] = [float(np.mean(diff_diff))]
+        features["std_2_diff_" + k] = [float(np.std(diff_diff))]
+        features["ske_2_diff_" + k] = [float(scipy.stats.skew(diff_diff, axis=0))]
+        features["kur_2_diff_" + k] = [float(scipy.stats.kurtosis(diff_diff, axis=0))]
+
+    features["min_pitch"] = [float(np.min(xpitch))]
+    features["max_pitch"] = [float(np.max(xpitch))]
+    features["mean_pitch"] = [float(np.mean(xpitch))]
+    features["std_pitch"] = [float(np.std(xpitch))]
+
+    return pd.DataFrame.from_dict(features)
+
+
