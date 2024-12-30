@@ -413,5 +413,3 @@ def calculate_selected_features(file_name):
 
     return pd.DataFrame.from_dict(features)
 
-
-calculate_selected_features("C:/School/RZP/vaje/Projekt/Emotional-speech-recognition/2.wav")
