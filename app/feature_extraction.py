@@ -37,13 +37,15 @@ def autocorrelation_pitch(frame, sr):
     corr = corr[len(corr)//2:]  
 
     d = np.diff(corr)
-    start = np.where(d > 0)[0][0]  
+    if np.any(d > 0):
+        start = np.where(d > 0)[0][0]  
+    else:start = 0
     peak = np.argmax(corr[start:]) + start  
     
     if peak > 0:
         return sr / peak
     else:
-        return 0.0
+        return 0
         
 def pitch(x, sr):
     pitches = []
@@ -412,3 +414,4 @@ def calculate_selected_features(file_name):
     return pd.DataFrame.from_dict(features)
 
 
+calculate_selected_features("C:/School/RZP/vaje/Projekt/Emotional-speech-recognition/2.wav")
