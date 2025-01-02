@@ -1,4 +1,5 @@
-from tkinter import Tk, Label, Button, Scale, filedialog
+from tkinter import *
+from tkinter import filedialog
 import numpy as np
 from audio_player import RealTimeAudioPlayer, AudioFilePlayer
 
@@ -16,6 +17,10 @@ sample_rate = None
 
 def select_file():
     global player_original, player_modified, file_name
+    if player_original:
+        player_original.stop()
+    if player_modified:
+        player_modified.stop()
 
     # Ask to select a file
     file_name = filedialog.askopenfilename(initialdir="C:/School/RZP/vaje/Projekt",
@@ -44,13 +49,6 @@ def add_sliders_and_controls():
     play_button_original.grid(row=1, column=0, padx=5, pady=10)
     pause_button_original.grid(row=1, column=1, padx=5, pady=10)
 
-    # Play and Pause buttons for Modified Audio
-    play_button_modified = Button(root, text="Play Modified", padx=6, pady=4, bg="white", command=player_modified.play)
-    pause_button_modified = Button(root, text="Pause Modified", padx=6, pady=4, bg="white", command=player_modified.pause)
-
-    play_button_modified.grid(row=2, column=0, padx=5, pady=10)
-    pause_button_modified.grid(row=2, column=1, padx=5, pady=10)
-
     # Link sliders to player
     def update_pitch(value):
         if player_modified:
@@ -59,24 +57,29 @@ def add_sliders_and_controls():
     def update_tempo(value):
         if player_modified:
             player_modified.update_tempo(float(value))
-
+            
     # Pitch slider
     Label(root, text="Pitch Shift (semitones):").grid(row=3, column=0, padx=10, pady=10)
-    pitch_slider = Scale(root, from_=-12, to=12, orient="horizontal", length=200, command=update_pitch)
+    pitch_var = DoubleVar()
+    pitch_slider = Scale(root, from_=-12, to=12, orient="horizontal", length=200, command=update_pitch, variable=pitch_var)
     pitch_slider.grid(row=3, column=1, columnspan=2, padx=10, pady=10)
 
     # Tempo slider
     Label(root, text="Tempo Multiplier:").grid(row=4, column=0, padx=10, pady=10)
-    tempo_slider = Scale(root, from_=0.5, to=2.0, resolution=0.1, orient="horizontal", length=200, command=update_tempo)
+    tempo_var = DoubleVar()
+    tempo_slider = Scale(root, from_=0.5, to=3.0, resolution=0.1, orient="horizontal", length=200, command=update_tempo, variable=tempo_var)
     tempo_slider.grid(row=4, column=1, columnspan=2, padx=10, pady=10)
+
+    # Play and Pause buttons for Modified Audio
+    play_button_modified = Button(root, text="Play Modified", padx=6, pady=4, bg="white", command=player_modified.play)
+    pause_button_modified = Button(root, text="Pause Modified", padx=6, pady=4, bg="white", command=player_modified.pause)
+
+    play_button_modified.grid(row=2, column=0, padx=5, pady=10)
+    pause_button_modified.grid(row=2, column=1, padx=5, pady=10)
 
     # Save button for the modified audio
     save_button = Button(root, text="Save Modified", padx=6, pady=4, bg="white", command=lambda: save_modified_audio())
     save_button.grid(row=5, column=0, padx=5, pady=10)
-
-    # pitch_slider.config(command=update_pitch)
-    # tempo_slider.config(command=update_tempo)
-
 
 def save_modified_audio():
     global player_modified

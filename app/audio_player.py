@@ -101,7 +101,7 @@ class RealTimeAudioPlayer:
         wf.close()
 
     def _apply_changes(self):
-        self.modified_audio = self.modified_audio.astype(np.float32)
+        self.modified_audio = self.original_audio.copy().astype(np.float32)
         self.modified_audio = librosa.effects.pitch_shift(self.modified_audio, sr=self.sample_rate, n_steps=self.current_pitch_shift)
         self.modified_audio = librosa.effects.time_stretch(self.modified_audio, rate=self.current_tempo_multiplier)
         
