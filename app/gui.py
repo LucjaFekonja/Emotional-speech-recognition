@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import filedialog
 import numpy as np
 from audio_player import RealTimeAudioPlayer, AudioFilePlayer
+from prediction import make_prediction, make_prediction_from_audio
 
 root = Tk()
 root.title("Emotion Recognition of Speech")
@@ -28,6 +29,9 @@ def select_file():
                                            filetypes=(("wav files", "*.wav"), ("all files", ".")))
     display_name = Label(root, text=file_name.split("/")[-1])
     display_name.grid(row=0, column=0)
+
+    display_emotion = Label(root, text=make_prediction(file_name))
+    display_emotion.grid(row=0, column=6)
 
     # Initialize the original player with the file path
     player_original = AudioFilePlayer(file_name)
@@ -57,18 +61,28 @@ def add_sliders_and_controls():
     def update_tempo(value):
         if player_modified:
             player_modified.update_tempo(float(value))
+
+    def update_volume(value):
+        if player_modified:
+            player_modified.update_volume(float(value))
             
+
     # Pitch slider
     Label(root, text="Pitch Shift (semitones):").grid(row=3, column=0, padx=10, pady=10)
-    pitch_var = DoubleVar()
-    pitch_slider = Scale(root, from_=-12, to=12, orient="horizontal", length=200, command=update_pitch, variable=pitch_var)
+    pitch_slider = Scale(root, from_=-4, to=4, resolution=0.01, orient="horizontal", length=200, command=update_pitch)
     pitch_slider.grid(row=3, column=1, columnspan=2, padx=10, pady=10)
 
     # Tempo slider
     Label(root, text="Tempo Multiplier:").grid(row=4, column=0, padx=10, pady=10)
-    tempo_var = DoubleVar()
-    tempo_slider = Scale(root, from_=0.5, to=3.0, resolution=0.1, orient="horizontal", length=200, command=update_tempo, variable=tempo_var)
+    tempo_slider = Scale(root, from_=0.5, to=3.0, resolution=0.01, orient="horizontal", length=200, command=update_tempo)
     tempo_slider.grid(row=4, column=1, columnspan=2, padx=10, pady=10)
+    tempo_slider.set(1)
+
+    # Volume slider
+    Label(root, text="Volume:").grid(row=5, column=0, padx=10, pady=10)
+    volume_slider = Scale(root, from_=0.0, to=2.0, resolution=0.01, orient="horizontal", length=200, command=update_volume)
+    volume_slider.grid(row=5, column=1, columnspan=2, padx=10, pady=10)
+    volume_slider.set(1)
 
     # Play and Pause buttons for Modified Audio
     play_button_modified = Button(root, text="Play Modified", padx=6, pady=4, bg="white", command=player_modified.play)
@@ -79,7 +93,8 @@ def add_sliders_and_controls():
 
     # Save button for the modified audio
     save_button = Button(root, text="Save Modified", padx=6, pady=4, bg="white", command=lambda: save_modified_audio())
-    save_button.grid(row=5, column=0, padx=5, pady=10)
+    save_button.grid(row=2, column=2, padx=5, pady=10)
+
 
 def save_modified_audio():
     global player_modified

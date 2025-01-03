@@ -77,6 +77,7 @@ class RealTimeAudioPlayer:
     def __init__(self, file_path):
         self.file_path = file_path
         self.chunk_size = 1024
+        self.current_position = 0
         self.pause_flag = threading.Event()
         self.pause_flag.set()  # Initially, playback is allowed
         self.stop_flag = True  # Indicates playback is stopped
@@ -87,6 +88,8 @@ class RealTimeAudioPlayer:
         self.modified_audio = None
         self.current_pitch_shift = 0.0  # Default pitch shift (no change)
         self.current_tempo_multiplier = 1.0  # Default tempo (normal speed)
+        self.volume_multiplier = 1.0  # Default volume (100%)
+        self.lock = threading.Lock()  # Initialize the lock for thread safety
 
         self.load_audio()
 
@@ -100,15 +103,6 @@ class RealTimeAudioPlayer:
         self.modified_audio = self.original_audio.copy()
         wf.close()
 
-    def _apply_changes(self):
-        self.modified_audio = self.original_audio.copy().astype(np.float32)
-        self.modified_audio = librosa.effects.pitch_shift(self.modified_audio, sr=self.sample_rate, n_steps=self.current_pitch_shift)
-        self.modified_audio = librosa.effects.time_stretch(self.modified_audio, rate=self.current_tempo_multiplier)
-        
-        # Ensure the modified audio is within the proper range for audio playback (int16)
-        self.modified_audio = np.clip(self.modified_audio, -32768, 32767)  # Ensure audio is within 16-bit range
-        self.modified_audio = self.modified_audio.astype(np.int16)  # Convert back to int16 for playback
-        return self.modified_audio
 
     def _play_audio(self):
         # Open a PyAudio stream
@@ -120,20 +114,34 @@ class RealTimeAudioPlayer:
             output=True
         )
 
+        chunk_size = self.chunk_size
         while not self.stop_flag:
-            # Get the modified audio based on current pitch/tempo
-            self.modified_audio = self._apply_changes()
+            self.pause_flag.wait()  # Wait here if paused
 
-            # Read and play audio in chunks
-            for i in range(0, len(self.modified_audio), self.chunk_size):
-                if self.stop_flag:  # Stop playback
+            # Apply pitch and tempo changes dynamically for the current chunk
+            with self.lock:  # Ensure thread safety
+                chunk_start = self.current_position
+                chunk_end = min(chunk_start + chunk_size, len(self.original_audio))
+                chunk_audio = self.original_audio[chunk_start:chunk_end].astype(np.float32)
+
+                if len(chunk_audio) == 0:  # End of audio
                     break
-                self.pause_flag.wait()  # Wait here if paused
-                chunk = self.modified_audio[i:i + self.chunk_size]
-                stream.write(chunk.tobytes())
 
-            # Set stop_flag to True when the audio finishes
-            self.stop_flag = True
+                modified_chunk = librosa.effects.pitch_shift(chunk_audio, sr=self.sample_rate, n_steps=self.current_pitch_shift)
+                modified_chunk = librosa.effects.time_stretch(modified_chunk, rate=self.current_tempo_multiplier)
+                modified_chunk *= self.volume_multiplier 
+
+                # Ensure the audio chunk is within the valid range
+                modified_chunk = np.clip(modified_chunk, -32768, 32767).astype(np.int16)
+
+            # Play the chunk
+            stream.write(modified_chunk.tobytes())
+            self.current_position = chunk_end
+
+            # Reset to the beginning if the audio has finished
+            if self.current_position >= len(self.original_audio):
+                self.stop_flag = True
+                self.current_position = 0
 
         # Close the stream and PyAudio instance
         stream.stop_stream()
@@ -161,7 +169,13 @@ class RealTimeAudioPlayer:
             self.thread.join()
 
     def update_pitch(self, pitch_shift):
-        self.current_pitch_shift = pitch_shift  # Update pitch shift
+        with self.lock:
+            self.current_pitch_shift = pitch_shift  # Update pitch shift dynamically
 
     def update_tempo(self, tempo_multiplier):
-        self.current_tempo_multiplier = tempo_multiplier  # Update tempo multiplier
+        with self.lock:
+            self.current_tempo_multiplier = tempo_multiplier  # Update tempo multiplier dynamically
+
+    def update_volume(self, volume):
+        with self.lock:
+            self.volume_multiplier = volume
