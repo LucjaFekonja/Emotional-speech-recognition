@@ -2,7 +2,8 @@ from tkinter import *
 from tkinter import filedialog
 import numpy as np
 from audio_player import RealTimeAudioPlayer, AudioFilePlayer
-from prediction import make_prediction, make_prediction_from_audio
+from prediction import make_prediction
+import change_emotion
 
 root = Tk()
 root.title("Emotion Recognition of Speech")
@@ -30,7 +31,8 @@ def select_file():
     display_name = Label(root, text=file_name.split("/")[-1])
     display_name.grid(row=0, column=0)
 
-    display_emotion = Label(root, text=make_prediction(file_name))
+    emotion = make_prediction(file_name)
+    display_emotion = Label(root, text=emotion)
     display_emotion.grid(row=0, column=6)
 
     # Initialize the original player with the file path
@@ -38,13 +40,6 @@ def select_file():
 
     # Initialize the modified player (initially no modifications)
     player_modified = RealTimeAudioPlayer(file_name)
-
-    # Add sliders and playback controls
-    add_sliders_and_controls()
-
-
-def add_sliders_and_controls():
-    global player_original, player_modified
 
     # Play and Pause buttons for Original Audio
     play_button_original = Button(root, text="Play Original", padx=6, pady=4, bg="white", command=player_original.play)
@@ -94,6 +89,146 @@ def add_sliders_and_controls():
     # Save button for the modified audio
     save_button = Button(root, text="Save Modified", padx=6, pady=4, bg="white", command=lambda: save_modified_audio())
     save_button.grid(row=2, column=2, padx=5, pady=10)
+
+    # Buttons to change emotion from neutral
+    if emotion == "neutral":
+        happy_button = Button(root, text="Happy", padx=6, pady=4, bg="white", command=lambda: change_emotion.neutral_to_happy(player_modified))
+        happy_button.grid(row=6, column=0, columnspan=1, padx=5, pady=10)
+
+        sad_button = Button(root, text="Sad", padx=6, pady=4, bg="white", command=lambda: change_emotion.neutral_to_sad(player_modified))
+        sad_button.grid(row=6, column=1, columnspan=1, padx=5, pady=10)
+        
+        angry_button = Button(root, text="Angry", padx=6, pady=4, bg="white", command=lambda: change_emotion.neutral_to_angry(player_modified))
+        angry_button.grid(row=6, column=2, columnspan=1, padx=5, pady=10)
+        
+        fearful_button = Button(root, text="Fearful", padx=6, pady=4, bg="white", command=lambda: change_emotion.neutral_to_fearful(player_modified))
+        fearful_button.grid(row=6, column=3, columnspan=1, padx=5, pady=10)
+        
+        disgusted_button = Button(root, text="Disgusted", padx=6, pady=4, bg="white", command=lambda: change_emotion.neutral_to_disgusted(player_modified))
+        disgusted_button.grid(row=6, column=4, columnspan=1, padx=5, pady=10)
+
+        surprised_button = Button(root, text="Surprised", padx=6, pady=4, bg="white", command=lambda: change_emotion.neutral_to_surprised(player_modified))
+        surprised_button.grid(row=6, column=5, columnspan=1, padx=5, pady=10)
+
+    # Buttons to change emotion from happy
+    elif emotion == "happy":
+        neutral_button = Button(root, text="Neutral", padx=6, pady=4, bg="white", command=lambda: change_emotion.happy_to_neutral(player_modified))
+        neutral_button.grid(row=6, column=0, columnspan=1, padx=5, pady=10)
+
+        sad_button = Button(root, text="Sad", padx=6, pady=4, bg="white", command=lambda: change_emotion.happy_to_sad(player_modified))
+        sad_button.grid(row=6, column=1, columnspan=1, padx=5, pady=10)
+        
+        angry_button = Button(root, text="Angry", padx=6, pady=4, bg="white", command=lambda: change_emotion.happy_to_angry(player_modified))
+        angry_button.grid(row=6, column=2, columnspan=1, padx=5, pady=10)
+        
+        fearful_button = Button(root, text="Fearful", padx=6, pady=4, bg="white", command=lambda: change_emotion.happy_to_fearful(player_modified))
+        fearful_button.grid(row=6, column=3, columnspan=1, padx=5, pady=10)
+        
+        disgusted_button = Button(root, text="Disgusted", padx=6, pady=4, bg="white", command=lambda: change_emotion.happy_to_disgusted(player_modified))
+        disgusted_button.grid(row=6, column=4, columnspan=1, padx=5, pady=10)
+
+        surprised_button = Button(root, text="Surprised", padx=6, pady=4, bg="white", command=lambda: change_emotion.happy_to_surprised(player_modified))
+        surprised_button.grid(row=6, column=5, columnspan=1, padx=5, pady=10)
+
+    # Buttons to change emotion from sad
+    elif emotion == "sadness":
+        neutral_button = Button(root, text="Neutral", padx=6, pady=4, bg="white", command=lambda: change_emotion.sad_to_neutral(player_modified))
+        neutral_button.grid(row=6, column=0, columnspan=1, padx=5, pady=10)
+
+        happy_button = Button(root, text="Happy", padx=6, pady=4, bg="white", command=lambda: change_emotion.sad_to_happy(player_modified))
+        happy_button.grid(row=6, column=1, columnspan=1, padx=5, pady=10)
+        
+        angry_button = Button(root, text="Angry", padx=6, pady=4, bg="white", command=lambda: change_emotion.sad_to_angry(player_modified))
+        angry_button.grid(row=6, column=2, columnspan=1, padx=5, pady=10)
+        
+        fearful_button = Button(root, text="Fearful", padx=6, pady=4, bg="white", command=lambda: change_emotion.sad_to_fearful(player_modified))
+        fearful_button.grid(row=6, column=3, columnspan=1, padx=5, pady=10)
+        
+        disgusted_button = Button(root, text="Disgusted", padx=6, pady=4, bg="white", command=lambda: change_emotion.sad_to_disgusted(player_modified))
+        disgusted_button.grid(row=6, column=4, columnspan=1, padx=5, pady=10)
+
+        surprised_button = Button(root, text="Surprised", padx=6, pady=4, bg="white", command=lambda: change_emotion.sad_to_surprised(player_modified))
+        surprised_button.grid(row=6, column=5, columnspan=1, padx=5, pady=10)
+
+    # Buttons to change emotion from angry
+    elif emotion == "angry":
+        neutral_button = Button(root, text="Neutral", padx=6, pady=4, bg="white", command=lambda: change_emotion.angry_to_neutral(player_modified))
+        neutral_button.grid(row=6, column=0, columnspan=1, padx=5, pady=10)
+
+        happy_button = Button(root, text="Happy", padx=6, pady=4, bg="white", command=lambda: change_emotion.angry_to_happy(player_modified))
+        happy_button.grid(row=6, column=1, columnspan=1, padx=5, pady=10)
+        
+        sad_button = Button(root, text="Sad", padx=6, pady=4, bg="white", command=lambda: change_emotion.angry_to_sad(player_modified))
+        sad_button.grid(row=6, column=2, columnspan=1, padx=5, pady=10)
+        
+        fearful_button = Button(root, text="Fearful", padx=6, pady=4, bg="white", command=lambda: change_emotion.angry_to_fearful(player_modified))
+        fearful_button.grid(row=6, column=3, columnspan=1, padx=5, pady=10)
+        
+        disgusted_button = Button(root, text="Disgusted", padx=6, pady=4, bg="white", command=lambda: change_emotion.angry_to_disgusted(player_modified))
+        disgusted_button.grid(row=6, column=4, columnspan=1, padx=5, pady=10)
+
+        surprised_button = Button(root, text="Surprised", padx=6, pady=4, bg="white", command=lambda: change_emotion.angry_to_surprised(player_modified))
+        surprised_button.grid(row=6, column=5, columnspan=1, padx=5, pady=10)
+
+    # Buttons to change emotion from fearful
+    elif emotion == "fearful":
+        neutral_button = Button(root, text="Neutral", padx=6, pady=4, bg="white", command=lambda: change_emotion.fearful_to_neutral(player_modified))
+        neutral_button.grid(row=6, column=0, columnspan=1, padx=5, pady=10)
+
+        happy_button = Button(root, text="Happy", padx=6, pady=4, bg="white", command=lambda: change_emotion.fearful_to_happy(player_modified))
+        happy_button.grid(row=6, column=1, columnspan=1, padx=5, pady=10)
+        
+        sad_button = Button(root, text="Sad", padx=6, pady=4, bg="white", command=lambda: change_emotion.fearful_to_sad(player_modified))
+        sad_button.grid(row=6, column=2, columnspan=1, padx=5, pady=10)
+        
+        angry_button = Button(root, text="Angry", padx=6, pady=4, bg="white", command=lambda: change_emotion.fearful_to_angry(player_modified))
+        angry_button.grid(row=6, column=3, columnspan=1, padx=5, pady=10)
+        
+        disgusted_button = Button(root, text="Disgusted", padx=6, pady=4, bg="white", command=lambda: change_emotion.fearful_to_disgusted(player_modified))
+        disgusted_button.grid(row=6, column=4, columnspan=1, padx=5, pady=10)
+
+        surprised_button = Button(root, text="Surprised", padx=6, pady=4, bg="white", command=lambda: change_emotion.fearful_to_surprised(player_modified))
+        surprised_button.grid(row=6, column=5, columnspan=1, padx=5, pady=10)
+
+    # Buttons to change emotion from disgusted
+    elif emotion == "disgusted":
+        neutral_button = Button(root, text="Neutral", padx=6, pady=4, bg="white", command=lambda: change_emotion.disgusted_to_neutral(player_modified))
+        neutral_button.grid(row=6, column=0, columnspan=1, padx=5, pady=10)
+
+        happy_button = Button(root, text="Happy", padx=6, pady=4, bg="white", command=lambda: change_emotion.disgusted_to_happy(player_modified))
+        happy_button.grid(row=6, column=1, columnspan=1, padx=5, pady=10)
+        
+        sad_button = Button(root, text="Sad", padx=6, pady=4, bg="white", command=lambda: change_emotion.disgusted_to_sad(player_modified))
+        sad_button.grid(row=6, column=2, columnspan=1, padx=5, pady=10)
+        
+        angry_button = Button(root, text="Angry", padx=6, pady=4, bg="white", command=lambda: change_emotion.disgusted_to_angry(player_modified))
+        angry_button.grid(row=6, column=3, columnspan=1, padx=5, pady=10)
+        
+        fearful_button = Button(root, text="Fearful", padx=6, pady=4, bg="white", command=lambda: change_emotion.disgusted_to_fearful(player_modified))
+        fearful_button.grid(row=6, column=4, columnspan=1, padx=5, pady=10)
+
+        surprised_button = Button(root, text="Surprised", padx=6, pady=4, bg="white", command=lambda: change_emotion.disgusted_to_surprised(player_modified))
+        surprised_button.grid(row=6, column=5, columnspan=1, padx=5, pady=10)
+
+    # Buttons to change emotion from surprised
+    elif emotion == "surprised":
+        neutral_button = Button(root, text="Neutral", padx=6, pady=4, bg="white", command=lambda: change_emotion.surprised_to_neutral(player_modified))
+        neutral_button.grid(row=6, column=0, columnspan=1, padx=5, pady=10)
+
+        happy_button = Button(root, text="Happy", padx=6, pady=4, bg="white", command=lambda: change_emotion.surprised_to_happy(player_modified))
+        happy_button.grid(row=6, column=1, columnspan=1, padx=5, pady=10)
+        
+        sad_button = Button(root, text="Sad", padx=6, pady=4, bg="white", command=lambda: change_emotion.surprised_to_sad(player_modified))
+        sad_button.grid(row=6, column=2, columnspan=1, padx=5, pady=10)
+        
+        angry_button = Button(root, text="Angry", padx=6, pady=4, bg="white", command=lambda: change_emotion.surprised_to_angry(player_modified))
+        angry_button.grid(row=6, column=3, columnspan=1, padx=5, pady=10)
+        
+        fearful_button = Button(root, text="Fearful", padx=6, pady=4, bg="white", command=lambda: change_emotion.surprised_to_fearful(player_modified))
+        fearful_button.grid(row=6, column=4, columnspan=1, padx=5, pady=10)
+
+        disgusted_button = Button(root, text="Disgusted", padx=6, pady=4, bg="white", command=lambda: change_emotion.surprised_to_disgusted(player_modified))
+        disgusted_button.grid(row=6, column=5, columnspan=1, padx=5, pady=10)
 
 
 def save_modified_audio():
