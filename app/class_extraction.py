@@ -4,14 +4,14 @@ def get_class_savee(file_name):
     if file_name[3] == "n":
         return "neutral"
     if file_name[3] == "a":
-        return "anger"
+        return "angry"
     if file_name[3] == "d":
-        return "disgust"
+        return "disgusted"
     if file_name[3] == "f":
-        return "fear"
+        return "fearful"
     if file_name[3] == "h":
-        return "happiness"
+        return "happy"
     if file_name[3:5] == "sa":
-        return "sadness"
+        return "sad"
     if file_name[3:5] == "su":
-        return "surprise"
+        return "surprised"
