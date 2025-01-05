@@ -363,7 +363,7 @@ def calculate_feature_matrix(file_names):
     return X
 
     
-def calculate_selected_features(file_name):
+def calculate_selected_features_savee(file_name):
     
     x, sr = read_file(file_name)
 
@@ -413,3 +413,77 @@ def calculate_selected_features(file_name):
 
     return pd.DataFrame.from_dict(features)
 
+
+
+
+def calculate_selected_features_tess(file_name):
+    
+    x, sr = read_file(file_name)
+    features = dict()
+
+    xfractal_dimension = fractal_dimension(x)
+    x2_diff_fractal_dimension = derivative(derivative(xfractal_dimension))
+
+    x2_diff_energy = derivative(derivative(energy(x)))
+    x2_diff_correlation_density = derivative(derivative(correlation_density(x)))
+
+    xmel1, xmel2, xmel3, xmel4, xmel5 = mel_band_energies(x, sr)
+    x1_diff_mel1 = derivative(xmel1)
+    x1_diff_mel2 = derivative(xmel2)
+    x1_diff_mel3 = derivative(xmel3)
+    x1_diff_mel5 = derivative(xmel5)
+    x2_diff_mel1 = derivative(x1_diff_mel1)
+    x2_diff_mel2 = derivative(x1_diff_mel2)
+    x2_diff_mel3 = derivative(x1_diff_mel3)
+    x2_diff_mel5 = derivative(x1_diff_mel5)
+
+    xzero_crossing_rate = zero_crossing_rate(x)
+    x1_diff_zero_crossing_rate = derivative(xzero_crossing_rate)
+    x2_diff_zero_crossing_rate = derivative(x1_diff_zero_crossing_rate)
+    
+
+    features["max_fractal_dimension"] = [float(np.max(xfractal_dimension))]
+    features["min_fractal_dimension"] = [float(np.min(xfractal_dimension))]
+
+    features["kur_2_diff_correlation_density"] = [float(scipy.stats.kurtosis(x2_diff_correlation_density, axis=0))]
+    features["ske_2_diff_correlation_density"] = [float(scipy.stats.skew(x2_diff_correlation_density, axis=0))]
+
+    features["kur_2_diff_fractal_dimension"] = [float(scipy.stats.kurtosis(x2_diff_fractal_dimension, axis=0))]
+    features["ske_2_diff_fractal_dimension"] = [float(scipy.stats.skew(x2_diff_fractal_dimension, axis=0))]
+    features["std_2_diff_fractal_dimension"] = [float(np.std(x2_diff_fractal_dimension))]
+    features["mean_2_diff_fractal_dimension"] = [float(np.mean(x2_diff_fractal_dimension))]
+
+    features["max_2_diff_zero_crossing_rate"] = [float(np.max(x2_diff_zero_crossing_rate))]
+    features["min_2_diff_zero_crossing_rate"] = [float(np.min(x2_diff_zero_crossing_rate))]
+
+    features["kur_2_diff_energy"] = [float(scipy.stats.kurtosis(x2_diff_energy, axis=0))]
+    features["ske_2_diff_energy"] = [float(scipy.stats.skew(x2_diff_energy, axis=0))]
+
+    features["kur_mel5"] = [float(scipy.stats.kurtosis(xmel5, axis=0))]
+
+    f = {
+        "mel1" : xmel1,
+        "1_diff_mel1" : x1_diff_mel1,
+        "2_diff_mel1" : x2_diff_mel1,
+        "mel2" : xmel2,
+        "1_diff_mel2" : x1_diff_mel2,
+        "2_diff_mel2" : x2_diff_mel2,
+        "mel3" : xmel3,
+        "1_diff_mel3" : x1_diff_mel3,
+        "2_diff_mel3" : x2_diff_mel3,
+        "mel4" : xmel4,
+        "1_diff_mel5" : x1_diff_mel5,
+        "2_diff_mel5" : x2_diff_mel5,
+        "zero_crossing_rate" : xzero_crossing_rate,
+        "1_diff_zero_crossing_rate" : x1_diff_zero_crossing_rate
+    }
+
+    for k, v in f.items():
+        features["min_" + k] = [float(np.min(v))]
+        features["max_" + k] = [float(np.max(v))]
+        features["mean_" + k] = [float(np.mean(v))]
+        features["std_" + k] = [float(np.std(v))]
+        features["ske_" + k] = [float(scipy.stats.skew(v, axis=0))]
+        features["kur_" + k] = [float(scipy.stats.kurtosis(v, axis=0))]
+
+    return pd.DataFrame.from_dict(features)
