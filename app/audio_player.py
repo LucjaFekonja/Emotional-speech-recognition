@@ -1,3 +1,5 @@
+import psutil
+import os
 import pyaudio
 import wave
 import threading
@@ -5,6 +7,7 @@ import numpy as np
 import librosa
 import librosa.effects
 
+process = psutil.Process(os.getpid())
 
 class AudioFilePlayer:
     def __init__(self, file_path):
@@ -30,6 +33,8 @@ class AudioFilePlayer:
             output=True
         )
 
+        # print(f"Memory before playing the original: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+
         # Read and play audio in chunks
         data = wf.readframes(self.chunk_size)
         while data:
@@ -48,6 +53,9 @@ class AudioFilePlayer:
         stream.close()
         p.terminate()
         wf.close()
+
+        # print(f"Memory after playing the original: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+
 
     def play(self):
         if self.stop_flag:
@@ -111,6 +119,8 @@ class RealTimeAudioPlayer:
             output=True
         )
 
+        # print(f"Memory before playing the modified: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+
         chunk_size = self.chunk_size
         while not self.stop_flag:
             self.pause_flag.wait()  # Wait here if paused
@@ -145,6 +155,9 @@ class RealTimeAudioPlayer:
         stream.close()
         p.terminate()
 
+        # print(f"Memory after playing the modified: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+
+
     def play(self):
         if self.stop_flag:
             # Reset flags and start playback
@@ -166,13 +179,21 @@ class RealTimeAudioPlayer:
             self.thread.join()
 
     def update_pitch(self, pitch_shift):
+        # print(f"Memory before updating pitch: {process.memory_info().rss / 1024 ** 2:.2f} MB")
         with self.lock:
             self.current_pitch_shift = pitch_shift  # Update pitch shift dynamically
+        # print(f"Memory after updating pitch: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+        
 
     def update_tempo(self, tempo_multiplier):
+        # print(f"Memory before updating tempo: {process.memory_info().rss / 1024 ** 2:.2f} MB")
         with self.lock:
             self.current_tempo_multiplier = tempo_multiplier  # Update tempo multiplier dynamically
+        # print(f"Memory after updating tempo: {process.memory_info().rss / 1024 ** 2:.2f} MB")
+        
 
     def update_volume(self, volume):
+        # print(f"Memory before updating volume: {process.memory_info().rss / 1024 ** 2:.2f} MB")
         with self.lock:
             self.volume_multiplier = volume
+        # print(f"Memory before updating volume: {process.memory_info().rss / 1024 ** 2:.2f} MB")
