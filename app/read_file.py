@@ -1,8 +1,5 @@
 import librosa
-import numpy as np
 from scipy.signal import lfilter
-import pyaudio
-import wave
 
 def read_file(file_name):
     "Loads and preprocesses a given file with the transfer function H(z) = 1 - 0.97 z^(-1)"

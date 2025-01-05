@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import librosa
 import scipy
-import pitch as pt
 from scipy.signal import correlate
 from scipy.signal import lfilter, find_peaks
 from scipy.signal.windows import hamming

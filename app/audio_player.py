@@ -2,9 +2,6 @@ import pyaudio
 import wave
 import threading
 import numpy as np
-import pyaudio
-import numpy as np
-import threading
 import librosa
 import librosa.effects
 
