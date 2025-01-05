@@ -36,14 +36,3 @@ def make_prediction_tess(file_name):
     Y_pred = ann.predict(X_selected)
 
     return Y_pred[0]
-
-
-import os
-path = "C:/School/RZP/vaje/Projekt/Emotional-speech-recognition/audio_savee/"
-
-for filename in os.listdir(path):
-
-    if filename[3] == "s":
-        file_path = os.path.join(path, filename)
-        pred = make_prediction_tess(file_path)
-        print(filename, pred)
