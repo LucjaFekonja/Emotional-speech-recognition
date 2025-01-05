@@ -51,7 +51,7 @@ def select_file():
     # print(f"Memory before selecting a file: {process.memory_info().rss / 1024 ** 2:.2f} MB")
 
     # Ask to select a file
-    file_name = filedialog.askopenfilename(initialdir="C:/School/RZP/vaje/Projekt",
+    file_name = filedialog.askopenfilename(initialdir="C:/",
                                            title="Select a file",
                                            filetypes=(("wav files", "*.wav"), ("all files", ".")))
     display_name = Label(frame, text=file_name.split("/")[-1])
