@@ -1,0 +1,9 @@
+numpy
+pandas
+pyaudio
+librosa
+sklearn
+torch
+scipy
+tkinter  
+argparse  
