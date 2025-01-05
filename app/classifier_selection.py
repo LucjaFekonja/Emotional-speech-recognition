@@ -7,7 +7,7 @@ from sklearn.svm import SVC
 import torch
 import torch.nn as nn
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score
 from sklearn.neural_network import MLPClassifier
 
 
@@ -32,14 +32,19 @@ def SVM(X, Y, n, dimension_reduction_technique):
     X_train, X_test, y_train, y_test = X_train.to_numpy(), X_test.to_numpy(), y_train.to_numpy(), y_test.to_numpy() 
 
     # Train SVM Classifier
-    svm = SVC(kernel='linear', C=1.0, random_state=42)
+    svm = SVC(kernel='rbf', C=1.0, random_state=42)
     svm.fit(X_train, y_train)
 
     # Predict and Evaluate
     y_pred = svm.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average='weighted')  
+    recall = recall_score(y_test, y_pred, average='weighted')
+    precision = precision_score(y_test, y_pred, average='weighted')
 
-    return accuracy
+    cm = confusion_matrix(y_test, y_pred, labels=["neutral", "happy", "sad", "angry", "fearful", "disgusted", "surprised"])
+
+    return accuracy, f1, recall, precision, cm
 
 
 
@@ -59,7 +64,7 @@ def ann(X, Y, n, dimension_reduction_technique):
     X_train, X_test, y_train, y_test = train_test_split(X_selected, Y, test_size=0.2, random_state=42)
 
     # Define and Train ANN with Multi-Layer Perceptron (MLP)
-    ann = MLPClassifier(hidden_layer_sizes=(10,), max_iter=1000, solver='lbfgs', random_state=42)
+    ann = MLPClassifier(hidden_layer_sizes=(10,), max_iter=1000, solver='adam', random_state=42)
 
     # Train the model
     ann.fit(X_train, y_train)
@@ -67,5 +72,10 @@ def ann(X, Y, n, dimension_reduction_technique):
     # Predict and Evaluate Performance
     y_pred = ann.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average='weighted')  
+    recall = recall_score(y_test, y_pred, average='weighted')
+    precision = precision_score(y_test, y_pred, average='weighted')
 
-    return accuracy
+    cm = confusion_matrix(y_test, y_pred, labels=["neutral", "happy", "sad", "angry", "fearful", "disgusted", "surprised"])
+
+    return accuracy, f1, recall, precision, cm
