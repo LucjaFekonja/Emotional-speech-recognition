@@ -21,9 +21,9 @@ pip install -r requirements.txt
 3. Run the application
 - using SAVEE database:
 ```
-python app.py savee
+python app/main.py savee
 ```
 - using TESS database:
 ```
-python app.py tess
+python app/main.py tess
 ```
